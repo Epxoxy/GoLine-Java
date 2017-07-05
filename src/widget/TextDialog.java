@@ -8,10 +8,10 @@ import javax.swing.SwingConstants;
 
 import common.IAction;
 
-public class DialogEx extends DialogBase{
+public class TextDialog extends DialogBase{
 	private JLabel textContent;
 	
-	public DialogEx(JLayeredPane topLayered){
+	public TextDialog(JLayeredPane topLayered){
 		super(topLayered, new JLabel());
 		textContent = (JLabel)super.getContent();
 		textContent.setHorizontalAlignment(SwingConstants.CENTER);

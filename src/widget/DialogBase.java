@@ -99,7 +99,7 @@ public class DialogBase {
 				dialogHost.setTransparent(cur);
 				dialogHost.repaint();
 			}
-		},alpha, 0f, alpha, 20);
+		},alpha, 0f, alpha, 150);
 	}
 
 	public JPanel getHost(){
@@ -132,8 +132,8 @@ public class DialogBase {
 		clearListeners(dialogOk);
 		ComponentsHelper.enableComponents(dialogHost, true);
 		//Initialize
-		animator.begin();
 		dialogTitle.setText(title);
+		animator.begin();
 		dialogOk.addActionListener(onhideIt);
 		dialogCancel.addActionListener(onhideIt);
 		if(onOk != null)

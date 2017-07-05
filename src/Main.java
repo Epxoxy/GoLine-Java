@@ -16,7 +16,7 @@ import core.resolver.ResolveCreator;
 import ui.MaterialButton;
 import widget.BoardView;
 import widget.DialogBase;
-import widget.DialogEx;
+import widget.TextDialog;
 import widget.helpers.LayoutHelper;
 import widget.helpers.SimpleJListGenerator;
 
@@ -76,7 +76,7 @@ public class Main {
 	private CardLayout cardLayout;
 	private JPanel rootContent;
 	private JLayeredPane topLayered;
-	private DialogEx textDialog;
+	private TextDialog textDialog;
 	private BoardView board;
 	private DialogBase selectionDialog;
 	private JList<String> modeList;
@@ -93,7 +93,7 @@ public class Main {
 		topLayered.setLayer(rootContent, 10);
 		rootContent.setLayout(new BorderLayout(0, 0));
 
-		textDialog = new DialogEx(topLayered);
+		textDialog = new TextDialog(topLayered);
 		textDialog.setSize(300, 300);
 		textDialog.setTransparent(0.7f);
 		modeList = SimpleJListGenerator.build(new String[] {
@@ -319,7 +319,7 @@ public class Main {
 							@Override
 							public void run(){
 								try {
-									Thread.sleep(2000);
+									Thread.sleep(1000);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
