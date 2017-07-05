@@ -1,5 +1,6 @@
 package core.interfaces;
 
+import common.TAction;
 import core.data.IntPoint;
 
 public interface IGameCoreResolver extends IDisposable{
@@ -17,5 +18,5 @@ public interface IGameCoreResolver extends IDisposable{
     void setFirst(String token);
     void undo();
     void setJudgedListener(JudgedLiteListener listener);
-    IntPoint tips();
+    void tips(TAction<IntPoint> onResult);
 }

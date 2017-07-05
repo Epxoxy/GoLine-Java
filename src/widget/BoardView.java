@@ -227,6 +227,11 @@ public class BoardView extends JComponent implements IBoard{
         }
         return null;
     }
+    
+    public void fakeInput(int x, int y){
+    	latticClickListener.onLatticeClick(x, y, maxRadius);
+    }
+    
     private MouseListener clickListener = new MouseListener(){
     	private int radius = (new Circle()).getRadius();
     	private ScaleAnimator animator = null;

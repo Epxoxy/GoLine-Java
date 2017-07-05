@@ -1,9 +1,13 @@
 package core.resolver.base;
 
+import java.util.Random;
+
+import common.TAction;
 import core.analyzer.AlphaBetaMaxMinAnalyzer;
 import core.data.ActionType;
 import core.data.IntPoint;
 import core.data.JudgeCode;
+import core.helpers.StopWatch;
 import core.interfaces.IAnalyzer;
 import core.interfaces.IBoard;
 import core.interfaces.IDisposable;
@@ -120,22 +124,41 @@ public abstract class CoreResolverBase implements IGameCoreResolver, IJudgeResol
         return this.joinBoxId;
     }
 
-    public IntPoint tips(){
+    public void tips(TAction<IntPoint> onResult){
         boolean isHostActive = isHostActive();
         int enemyId = isHostActive ? joinBoxId : hostBoxId;
         int activeId = isHostActive ? hostBoxId : joinBoxId;
-        return analysisTips(activeId, enemyId);
+        analysisTips(activeId, enemyId, onResult);
     }
 
-    private IntPoint analysisTips(int userId, int enemyId){
+    private void analysisTips(int userId, int enemyId,TAction<IntPoint> onResult){
         IMap map = judges.getJudgeUnit().getMap();
         //User as environment, other part as user
         //Find a good result
-        IAnalyzer<IMap, IntPoint> tipsAnalyzer = new AlphaBetaMaxMinAnalyzer(userId, enemyId);
-        IntPoint p = null;
-        int deep = 10;
-        p = tipsAnalyzer.analysis(map, deep);
-        return p;
+        Thread thread = new Thread(){
+        	@Override
+        	public void run(){
+                long delay = (new Random()).nextInt(500) + 200;
+                StopWatch sw = new StopWatch();
+                sw.start();
+                IAnalyzer<IMap, IntPoint> tipsAnalyzer = new AlphaBetaMaxMinAnalyzer(userId, enemyId);
+                IntPoint p = null;
+                int deep = 10;
+                p = tipsAnalyzer.analysis(map, deep);
+                sw.stop();
+                long used = sw.getTime();
+                if (used < delay){
+                    try {
+                        Thread.sleep(delay - used);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(onResult != null)
+                	onResult.onAction(p);
+        	}
+        };
+        thread.start();
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JButton;
 
 import core.data.AILevel;
+import core.data.IntPoint;
 import core.data.JudgeCode;
 import core.interfaces.IBoard;
 import core.interfaces.IGameCoreResolver;
@@ -42,6 +43,7 @@ import javax.swing.border.EmptyBorder;
 
 import common.ColorEx;
 import common.IAction;
+import common.TAction;
 
 public class Main {
 
@@ -188,16 +190,20 @@ public class Main {
 		JButton startBtn = new MaterialButton("Start");
 		JButton undoBtn = new MaterialButton("Undo");
 		JButton resetBtn = new MaterialButton("Reset");
-		JButton backBtn = new MaterialButton("back");
+		JButton backBtn = new MaterialButton("Back");
+		JButton tipsmodeBtn = new MaterialButton("Auto");
 		Font basicFont = new Font("Segoe UI", Font.PLAIN, 20);
+		tipsmodeBtn.setForeground(Color.GRAY);
 		startBtn.setFont(basicFont);
 		undoBtn.setFont(basicFont);
 		resetBtn.setFont(basicFont);
 		backBtn.setFont(basicFont);
+		tipsmodeBtn.setFont(basicFont);
 		bottomPanel.add(startBtn);
 		bottomPanel.add(undoBtn);
 		bottomPanel.add(resetBtn);
 		bottomPanel.add(backBtn);
+		bottomPanel.add(tipsmodeBtn);
 		
 		JPanel panel = new JPanel();
 		gamePanel.add(panel);
@@ -212,6 +218,8 @@ public class Main {
 		
 		toGameBtn.addActionListener(showModeSelection);
 		setupListener(startBtn,resetBtn,undoBtn,backBtn);
+		tipsmodeBtn.addActionListener(autoMode);
+		
 		
 	}
 	
@@ -228,6 +236,24 @@ public class Main {
 					setupResolver(index, board);
 				}
 			}, null);
+		}
+	};
+	
+	private TipsModeListener autoMode = new TipsModeListener();
+	private class TipsModeListener implements ActionListener{
+		private boolean isTipsMode;
+		public boolean isTipsMode(){return this.isTipsMode;}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			isTipsMode = !isTipsMode;
+			Object src = e.getSource();
+			if(src instanceof JButton){
+				JButton btn = (JButton)src;
+				btn.setForeground(isTipsMode ? Color.BLACK : Color.LIGHT_GRAY);
+				if(isTipsMode && resolver.isHostActive()){
+					judgelite.onJudged(JudgeCode.Active);
+				}
+			}
 		}
 	};
 	
@@ -262,16 +288,26 @@ public class Main {
 	
 
 	private JudgedLiteListener judgelite = new JudgedLiteListener(){
+		private Color active = ColorEx.ACTIVE;
+		private Color origin = Color.WHITE;
 		@Override
 		public void onJudged(JudgeCode code) {
 			switch(code){
 				case Active:{
 					if(resolver.isHostActive()){
-						p2Label.setBackground(p1Label.getBackground());
-						p1Label.setBackground(ColorEx.ACTIVE);
+						p2Label.setBackground(origin);
+						p1Label.setBackground(active);
 					}else {
-						p1Label.setBackground(p2Label.getBackground());
-						p2Label.setBackground(ColorEx.ACTIVE);
+						p1Label.setBackground(origin);
+						p2Label.setBackground(active);
+					}
+					if(resolver.isHostActive() && autoMode.isTipsMode()){
+						resolver.tips(new TAction<IntPoint>(){
+							@Override
+							public void onAction(IntPoint data) {
+								board.fakeInput(data.x, data.y);
+							}
+						});
 					}
 				}break;
 				case Ended:{
@@ -279,11 +315,23 @@ public class Main {
 					if(winner != null && winner.length() > 0){
 						boolean hostWin = resolver.getHostToken().equals(winner);
 						String text = hostWin ? "P1 WIN" : "P2 WIN";
-						textDialog.showDialog("NEW WINNER", text, null, null);
+						Thread thread = new Thread(){
+							@Override
+							public void run(){
+								try {
+									Thread.sleep(2000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								textDialog.showDialog("NEW WINNER", text, null, null);
+							}
+						};
+						thread.start();
 					}
 				}break;
 				case Started:{
-					
+					p1Label.setBackground(Color.WHITE);
+					p2Label.setBackground(Color.WHITE);
 				}break;
 				default:break;
 			}
