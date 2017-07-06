@@ -12,6 +12,7 @@ public abstract class AnimatorBase<T>{
 	private Timer timer;
 	private IAnimated<Double> onProgress;
 	protected boolean isRunning;
+	private boolean isReversal;
 	private IAction onCompleted;
 	private IAnimatedValueCalculator<T> cal;
     private IAnimated<T> animated;
@@ -55,6 +56,10 @@ public abstract class AnimatorBase<T>{
     	return this.origin;
     }
     
+    public boolean isReversal(){
+    	return this.isReversal;
+    }
+    
 	public AnimatorBase<T> begin(){
 		if(!isRunning){
 			progress = 0;
@@ -87,6 +92,7 @@ public abstract class AnimatorBase<T>{
 	}
 
 	public AnimatorBase<T> reversal(){
+		isReversal = !isReversal;
 		pause();
 		progress = 1 - progress;
 		T tmp = from;

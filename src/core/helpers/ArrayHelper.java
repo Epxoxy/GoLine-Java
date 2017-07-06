@@ -11,4 +11,8 @@ public class ArrayHelper {
         }
         return copy;
     }
+    
+    public static <T> boolean inRange(int x, int y, T[][] array){
+    	return x >= 0 && y >= 0 && array.length > x && array[x].length > y;
+    }
 }

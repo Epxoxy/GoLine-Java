@@ -17,6 +17,7 @@ import javax.swing.JComponent;
 import animator.ScaleAnimator;
 import animator.IDoubleAnimated;
 import common.ColorEx;
+import core.helpers.ArrayHelper;
 import core.interfaces.IBoard;
 import core.interfaces.LatticeClickListener;
 import widget.helpers.Bound;
@@ -233,45 +234,79 @@ public class BoardView extends JComponent implements IBoard{
     }
     
     private MouseListener clickListener = new MouseListener(){
-    	private int radius = (new Circle()).getRadius();
     	private ScaleAnimator animator = null;
+    	private boolean isCirclePress = false;
+    	private boolean isEmptyPress = false;
+    	private int radius = (new Circle()).getRadius();
+    	private int pressX;
+    	private int pressY;
+    	private int[] downCR;
+    	
     	@Override
     	public void mouseClicked(MouseEvent e) {
-    		animator = null;
-    		int x = e.getX();
-    		int y = e.getY();
-    		int[] data = calculateColumnRow(x, y);
-    		if(data != null &&  circles[data[0]][data[1]] == null && latticClickListener != null)
-    			latticClickListener.onLatticeClick(data[0], data[1], maxRadius);
     	}
 
     	@Override
     	public void mousePressed(MouseEvent e) {
-    		int x = e.getX();
-    		int y = e.getY();
-    		int[] data = calculateColumnRow(x, y);
-    		if(data != null && circles[data[0]][data[1]] != null){
-    			animator = new ScaleAnimator(new IDoubleAnimated(){
-    				@Override
-    				public void onAnimated(Double scale) {
-    					int cur = (int)(scale * radius);
-    					circles[data[0]][data[1]].setRadius(cur); 
-    					repaint();
-    				}
-    			},1d, 1.6d, 100);
-    			animator.begin();
+    		pressX = e.getX();
+    		pressY = e.getY();
+    		downCR = calculateColumnRow(pressX, pressY);
+    		if(downCR != null && ArrayHelper.inRange(downCR[0], downCR[1], circles) ){
+    			if(circles[downCR[0]][downCR[1]] != null){
+    				int[] cr = downCR;
+        			isCirclePress = true;
+        			animator = new ScaleAnimator(new IDoubleAnimated(){
+        				@Override
+        				public void onAnimated(Double scale) {
+        					int cur = (int)(scale * radius);
+        					if(circles[cr[0]][cr[1]] != null){
+        						circles[cr[0]][cr[1]].setRadius(cur); 
+            					repaint();
+        					}
+        				}
+        			},1d, 1.6d, 100);
+        			animator.begin();
+    			}else isEmptyPress = true;
+    		}else {
+    			downCR = null;
+    			isCirclePress = false;
     		}
     	}
+    	
     	@Override
     	public void mouseReleased(MouseEvent e) {
-    		if(animator != null){
-    			animator.reversal();
+    		if(isCirclePress){
+        		if(animator != null && !animator.isReversal()){
+        			animator.reversal();
+        		}
+    		}else if(isEmptyPress){
+        		int releasedX = e.getX();
+        		int releasedY = e.getY();
+				int[] cr = downCR;
+				downCR = null;
+        		if(Math.abs(pressX - releasedX) < radius
+        				&& Math.abs(pressY - releasedY) < radius){
+        			if(cr != null && latticClickListener != null){
+        				latticClickListener.onLatticeClick(cr[0], cr[1], maxRadius);
+        			}
+        		}
     		}
+    		isEmptyPress = false;
+    		isCirclePress = false;
+			downCR = null;
+    		pressX = 0;
+    		pressY = 0;
     	}
     	@Override
     	public void mouseEntered(MouseEvent e) {}
     	@Override
-    	public void mouseExited(MouseEvent e) {}
+    	public void mouseExited(MouseEvent e) {
+    		if(isCirclePress && animator != null && !animator.isReversal()){
+    			animator.reversal();
+    		}
+    		isEmptyPress = false;
+    		isCirclePress = false;
+    	}
     };
 
     

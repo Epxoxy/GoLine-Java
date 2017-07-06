@@ -71,14 +71,11 @@ public class DataBox {
     }
 
     //Reset a recorded point to default value
-    public boolean reset(int x, int y)
-    {
-        if(x< datas.length && y < datas[0].length)
-        {
+    public boolean reset(int x, int y){
+        if(x< datas.length && y < datas[0].length){
             int data = datas[x][y];
-            if(data > ok && data != no)
-            {
-                --reachableCount;
+            if(data > ok && data != no){
+                ++reachableCount;
                 int v = stepCountor.get(data);
                 stepCountor.put(data, v - 1);
                 datas[x][y] = ok;
@@ -88,16 +85,13 @@ public class DataBox {
         return false;
     }
 
-    public boolean isDataIn(int x, int y, int value)
-    {
+    public boolean isDataIn(int x, int y, int value){
         int data = datas[x][y];
         return data == value;
     }
 
-    public DataPoint undo()
-    {
-        if(canUndo())
-        {
+    public DataPoint undo(){
+        if(canUndo()){
             DataPoint dp = undoList.pop();
             redoList.push(dp);
             reset(dp.getX(), dp.getY());
@@ -106,53 +100,43 @@ public class DataBox {
         return null;
     }
 
-    public DataPoint Redo()
-    {
-        if (canRedo())
-        {
+    public DataPoint redo(){
+        if (canRedo()) {
             DataPoint dp = redoList.pop();
             undoList.push(dp);
-            reset(dp.getX(), dp.getY());
+            //reset(dp.getX(), dp.getY());
             return dp;
         }
         return null;
     }
 
-    public DataPoint peekRedo()
-    {
-        if (canRedo())
-        {
+    public DataPoint peekRedo(){
+        if (canRedo()){
             DataPoint dp = redoList.peek();
             return dp;
         }
         return null;
     }
 
-    public DataPoint peekUndo()
-    {
-        if (canUndo())
-        {
+    public DataPoint peekUndo(){
+        if (canUndo()){
             DataPoint dp = undoList.peek();
             return dp;
         }
         return null;
     }
 
-    public void resetData()
-    {
+    public void resetData(){
         initialize();
     }
 
-    public int[][] copy()
-    {
+    public int[][] copy(){
         return ArrayHelper.copyMatrix(datas);
     }
 
-    private boolean recordInternal(int x, int y, int data)
-    {
+    private boolean recordInternal(int x, int y, int data){
         //Check if data valid
-        if (isValid(x, y, data))
-        {
+        if (isValid(x, y, data)){
             datas[x][y] = data;
             --reachableCount;
 
@@ -166,8 +150,7 @@ public class DataBox {
         return false;
     }
 
-    private void initialize()
-    {
+    private void initialize(){
         reachableCount = 0;
         datas = ArrayHelper.copyMatrix(fixEntry);
         stepCountor = new WeakHashMap<>();
