@@ -8,6 +8,7 @@ public class ColorEx {
     public static final Color SKYBLUE = parse("#ceeb");
     public static final Color BLUEGREY = parse("#B0BEC5");
     public static final Color NORMALBG = parse("#fafafa");
+    public static final Color ACCENT = parse("#424242");
     
     private static Color parse(String color){
     	int i = Integer.parseInt(color.substring(1), 16);

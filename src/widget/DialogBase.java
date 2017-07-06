@@ -27,7 +27,7 @@ import common.IAction;
 import ui.MaterialButton;
 import widget.helpers.ComponentsHelper;
 
-public class DialogBase {
+public class DialogBase implements IHost{
 	private JLayeredPane topLayered;
 	private TranslucencePane dialogHost;
 	private JLabel dialogTitle;
@@ -166,6 +166,7 @@ public class DialogBase {
 	}
 	
 	private void clearListeners(JButton btn){
+		if(btn == null) return;
 		ActionListener[] listeners = btn.getActionListeners();
 		for(ActionListener l : listeners){
 			btn.removeActionListener(l);

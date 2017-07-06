@@ -16,7 +16,8 @@ import core.resolver.ResolveCreator;
 import ui.MaterialButton;
 import widget.BoardView;
 import widget.DialogBase;
-import widget.TextDialog;
+import widget.IHost;
+import widget.ToastBase;
 import widget.helpers.LayoutHelper;
 import widget.helpers.SimpleJListGenerator;
 
@@ -76,14 +77,13 @@ public class Main {
 	private CardLayout cardLayout;
 	private JPanel rootContent;
 	private JLayeredPane topLayered;
-	private TextDialog textDialog;
 	private BoardView board;
 	private DialogBase selectionDialog;
+	private ToastBase toast;
 	private JList<String> modeList;
-	private List<DialogBase> dialogList = new ArrayList<DialogBase>();
+	private List<IHost> hostList = new ArrayList<IHost>();
 	private JLabel p1Label;
 	private JLabel p2Label;
-	
 	
 	private void initRootPanel(JFrame frame){
 		topLayered = new JLayeredPane();
@@ -93,27 +93,26 @@ public class Main {
 		topLayered.setLayer(rootContent, 10);
 		rootContent.setLayout(new BorderLayout(0, 0));
 
-		textDialog = new TextDialog(topLayered);
-		textDialog.setSize(300, 300);
-		textDialog.setTransparent(0.7f);
+		toast = new ToastBase(topLayered);
+		hostList.add(toast);
 		modeList = SimpleJListGenerator.build(new String[] {
 				"Player vs Player", "Player vs AI", "Online"
 		});
 		selectionDialog = new DialogBase(topLayered, LayoutHelper.putGridBag(modeList));
 		selectionDialog.setSize(300, 300);
-		dialogList.add(selectionDialog);
-		dialogList.add(textDialog);
+		hostList.add(selectionDialog);
 		frame.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				Dimension dimensionNew = topLayered.getSize();
 				Rectangle rectangleNew = new Rectangle(new Point(), dimensionNew);
-				for(DialogBase dialog : dialogList){
+				for(IHost dialog : hostList){
 					if(dialog == null) continue;
 					dialog.getHost().setBounds(rectangleNew);
 				}
 				rootContent.setBounds(rectangleNew);
 			}
 		});
+		
 	}
 
 	/**
@@ -220,7 +219,6 @@ public class Main {
 		setupListener(startBtn,resetBtn,undoBtn,backBtn);
 		tipsmodeBtn.addActionListener(autoMode);
 		
-		
 	}
 	
 	private ActionListener showModeSelection = new ActionListener(){
@@ -315,21 +313,11 @@ public class Main {
 					if(winner != null && winner.length() > 0){
 						boolean hostWin = resolver.getHostToken().equals(winner);
 						String text = hostWin ? "P1 WIN" : "P2 WIN";
-						Thread thread = new Thread(){
-							@Override
-							public void run(){
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								textDialog.showDialog("NEW WINNER", text, null, null);
-							}
-						};
-						thread.start();
-					}
+						toast.showToast("NEW WINNER : " + text);
+					}else toast.showToast("Game is ended in a tie.");
 				}break;
 				case Started:{
+					toast.showToast("Hello, Game is started.");
 					p1Label.setBackground(Color.WHITE);
 					p2Label.setBackground(Color.WHITE);
 				}break;

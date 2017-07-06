@@ -91,7 +91,12 @@ public abstract class AnimatorBase<T>{
 		return this;
 	}
 
+
 	public AnimatorBase<T> reversal(){
+		return reversal(true);
+	}
+	
+	public AnimatorBase<T> reversal(boolean autoStart){
 		isReversal = !isReversal;
 		pause();
 		progress = 1 - progress;
@@ -100,7 +105,8 @@ public abstract class AnimatorBase<T>{
 		to = tmp;
 		current = from;
 		cal = makeCal(from, to);
-		begin();
+		if(autoStart)
+			begin();
 		return this;
 	}
 	

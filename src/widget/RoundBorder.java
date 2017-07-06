@@ -23,6 +23,7 @@ public class RoundBorder implements Border {
 	public void setRound(int round){
 		this.round = round;
 	}
+	
 
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 		Graphics2D g2 = (Graphics2D) g;
