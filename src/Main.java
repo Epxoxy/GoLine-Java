@@ -163,7 +163,7 @@ public class Main {
 		gamePanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel topPanel = new JPanel();
-		topPanel.setBorder(new EmptyBorder(20, 30, 10, 30));
+		topPanel.setBorder(new EmptyBorder(60, 30, 0, 30));
 		gamePanel.add(topPanel, BorderLayout.NORTH);
 		topPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
